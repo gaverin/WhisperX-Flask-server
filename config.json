@@ -1,0 +1,12 @@
+{
+    "server_settings": {
+      "address": "0.0.0.0",
+      "port": 5000
+    },
+    "transcription_settings": {
+      "compute_power": "GPU_ONLY",
+      "transcription_mode": "HIGH_ACCURACY",
+      "num_jobs": 1
+    }
+}
+  
