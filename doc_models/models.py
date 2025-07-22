@@ -13,9 +13,9 @@ transcription_settings_model = Model(
     "TranscriptionSettings",
     {
         "compute_power": fields.String(required=True, 
-            description="Compute power (e.g., 'COMBINED', 'GPU_ONLY', 'CPU_ONLY')"),
+            description="Compute power (e.g. 'GPU_ONLY', 'CPU_ONLY')"),
         "transcription_mode": fields.String(required=True, 
-            description="Transcription mode (e.g., 'HIGH_ACCURACY', 'LOW_LATENCY')"),
+            description="Transcription mode (e.g. 'HIGH_ACCURACY', 'LOW_LATENCY')"),
         "num_jobs": fields.Integer(required=True, 
             description="Number of concurrent transcription jobs"),
     }
