@@ -10,10 +10,10 @@ import subprocess
 import sys
 
 from configuration.config import Config
-from model.transcriber import Transcriber
-from model.enums import Status
-from model.logger import Logger
-from doc_models.models import *
+from transcription.transcriber import Transcriber
+from transcription.enums import Status
+from transcription.logger import Logger
+from api_models.models import *
 
 # FLASK APP AND RESTX API
 app = Flask(__name__)
@@ -27,7 +27,7 @@ def main():
     logger.log(f"Server started")
 
     # LOAD CONFIGURATION 
-    CONFIG_FILE_PATH = "/tmp/config.json" 
+    CONFIG_FILE_PATH = "/tmp/sttconfig.json" 
     config = Config(CONFIG_FILE_PATH)
     logger.log(f"Configuration saved in {CONFIG_FILE_PATH}")
 
@@ -114,7 +114,7 @@ def main():
             guid = transcriber.transcribe(path_to_audio, language)
             if guid is None:
                 logger.log("Transcribe: transcription job not started")
-                return {"error": f"max {config.get_transcription_settings().get_num_jobs()} transcriptions concurrently. Change the configuration"}, 400
+                return {"error": f"{config.get_transcription_settings().get_num_jobs()} concurrent transcriptions allowed. Change the configuration"}, 400
             else:
                 logger.log(f"Transcribe: job {guid} started")
                 return {"job_guid": f"{guid}"}, 200
@@ -139,12 +139,6 @@ def main():
             elif status is not None:
                 return {"guid": guid, "status": str(status), "result": None}, 200
             else:
-                # check also completed jobs saved in OUTPUT_DIR
-                for file_name in os.listdir(OUTPUT_DIR):
-                    if file_name == guid + ".json":
-                        with open(os.path.join(OUTPUT_DIR,file_name), "r") as result_file:
-                            result = json.load(result_file)
-                            return {"guid": guid, "status": str(Status.COMPLETED), "result" : result}, 200
                 return {"error": "job doesn't exist"}, 400
 
 
@@ -175,11 +169,6 @@ def main():
         def get(self):
             """Get all the jobs and their status"""
             job_list = transcriber.get_jobs()
-            for file_name in os.listdir(OUTPUT_DIR):
-                guid = file_name.replace(".json", "")
-                job_list.append({"guid":guid, "status":str(Status.COMPLETED)})    
-            return job_list, 200
-
 
     @api.route('/restart')
     class Restart(Resource):
