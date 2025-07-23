@@ -115,7 +115,6 @@ class Transcriber:
         self.__shutdown_event.set()  # Signal the thread to stop
         self.__watchdog.join()  # Wait for the thread to finish
     
-    
     def __job_watchdog(self):        
         while not self.__shutdown_event.is_set():
             self.count_lock.acquire()
