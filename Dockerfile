@@ -12,20 +12,20 @@ RUN pip3 install --ignore-installed Flask
 RUN pip3 install flask-restx
 RUN pip3 install psutil
 
-RUN mkdir /var/log/stt-server
-RUN mkdir /tmp/results
-RUN mkdir /sttServer
-RUN mkdir /W
+RUN mkdir /var/log/WhisperX-Flask-server
+RUN mkdir /tmp/jobs
+RUN mkdir /WhisperX-Flask-server
+RUN mkdir /audio
 
 COPY ./config.json /tmp/
-COPY ./configuration /sttServer/configuration/
-COPY ./doc_models /sttServer/doc_models/
-COPY ./model /sttServer/model/
-COPY ./restart.sh /sttServer/
-COPY ./stt_server.py /sttServer/
+COPY ./configuration /WhisperX-Flask-server/configuration/
+COPY ./doc_models /WhisperX-Flask-server/api_models/
+COPY ./model /WhisperX-Flask-server/transcription/
+COPY ./restart.sh /WhisperX-Flask-server/
+COPY ./server.py /WhisperX-Flask-server/
 
-WORKDIR /sttServer
+WORKDIR /WhisperX-Flask-server
 
 EXPOSE 5000
 
-CMD ["python3", "stt_server.py"]
+CMD ["python3", "server.py"]

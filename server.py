@@ -22,22 +22,22 @@ api = Api(app, version="1.0", title="Speech-to-Text Server API", description="AP
 # MAIN
 def main():
     # LOGGER
-    LOG_DIR_PATH = "/var/log/stt-server"
+    LOG_DIR_PATH = "/var/log/WhisperX-Flask-server"
     logger = Logger(LOG_DIR_PATH)
     logger.log(f"Server started")
 
     # LOAD CONFIGURATION 
-    CONFIG_FILE_PATH = "/tmp/sttconfig.json" 
+    CONFIG_FILE_PATH = "/tmp/config.json" 
     config = Config(CONFIG_FILE_PATH)
     logger.log(f"Configuration saved in {CONFIG_FILE_PATH}")
 
     # TRANSCRIBER
-    OUTPUT_DIR = "/tmp/results" 
+    OUTPUT_DIR = "/tmp/jobs" 
     logger.log(f"Transcriptions saved in {OUTPUT_DIR}")
     transcriber = Transcriber(config.get_transcription_settings(), OUTPUT_DIR)
     
     # PID FILE USED IN RESTART
-    PID_FILE = "/tmp/stt-server.pid"
+    PID_FILE = "/tmp/WhisperX-Flask-server.pid"
     with open(PID_FILE, 'w') as pid_f:
         pid_f.write(str(os.getpid()))
     logger.log(f"Pid saved in {PID_FILE}")

@@ -1,22 +1,41 @@
 # WhisperX-Flask-server
-WhisperX-Flask-server is simple speech-to-text containerized microservice based on WhipserX and Flask. It provides a swaggerUI interface that allows you to easily interact with the endpoints and pass the right arguments.
+WhisperX-Flask-server is simple speech-to-text containerized microservice based on WhipserX and Flask. It provides a SwaggerUI interface that allows you to easily interact with the APIs and pass the correct arguments.
 
 ## Getting started
-
+1. Clone this repository and navigate into it:
+    ```
+    git clone https://github.com/gaverin/WhisperX-Flask-server.git
+    cd WhisperX-Flask-server
+    ```
+2. Build the Docker container:
+    ```
+    docker build -t WhisperX-Flask-server .
+    ```
+3. Run the container and map the host machine directory containing the audio files to the `/audio` directory in the container:
+    ```
+    docker run --gpus all -p 8080:5000 -v /HOST/AUDIO/DIRECTORY:/audio WhisperX-Flask-server:latest
+    ```
+4. Open the Swagger UI interface at:  
+   `http://<HOST_MACHINE_IP>:8080/api`
 
 ## How does it work
-Every time the server accepts a transcription request via the `/transcribe` endpoint, a new process is launched on the server machine so that the request can be processed asynchronously. In this way multiple transcriptions can be performed at the same time if you have enough resources. 
+Each time the server accepts a transcription request via the `/transcribe` endpoint, a new process is launched. This enables asynchronous processing and allows multiple transcriptions to run concurrently, provided sufficient resources are available.
 
-Once a transcription job starts, the server returns a GUID that can be used with the `/getStatus` endpoint to check the progress of that Job. Once the Job is completed the trascription dict is returned with the status.
+After the transcription job starts, the server returns a GUID that can be used with the `/getStatus` endpoint to check its progress. Once the Job is completed the trascription is returned with the final status.
 
-The files need to be on the server filesystem, therefore you will need to map a local directory to your container.
+> **Note:** Files must be available on the server filesystem. Be sure to mount a local directory to the container.
 
 ## Configuration file
-The configuration parameters are stored in the `config.json` (copyied in the /tmp directory of the container). You can get the transcription settings options using the `/GetConfigOptions` endpoint.
+Configuration parameters are stored in the `config.json` (copyied in the `/tmp` directory of the container). You can get the transcription settings options using the `/GetConfigOptions` endpoint.
 
-Currently, the WhisperX parameters are abstracted from the client and the service is designed to have 2 transcription modes:
-- `HIGH_ACCURACY`: uses the large-v2 model, batch_size=16 (4 on CPU) and compute_type=float_16 (int 8 on CPU)
-- `LOW_LATENCY`: uses the medium model, batch_size=16 (4 on CPU) and compute_type=float_16 (int8 on CPU)
+Currently, the WhisperX parameters are abstracted from the client and the service is designed to have two transcription modes:
+
+| Mode            | Model      | Batch Size       | Compute Type               | Threads      |
+|-----------------|------------|------------------|----------------------------|--------------|
+| `HIGH_ACCURACY` | `large-v2` | 16 (4 on CPU)    | `float16` (`int8` on CPU)  | 1 (4 on CPU) |
+| `LOW_LATENCY`   | `medium`   | 16 (4 on CPU)    | `float16` (`int8` on CPU)  | 1 (4 on CPU) |
+
+> **Note:** The parameters  were tuned for an **RTX 4070 Ti** and a **16 core intel i7 CPU**. If you wish to change the behaviour you can check the `transcribe` function in `transcriber.py`
 
 ## Endpoints
 - `/setConfig`
@@ -30,10 +49,10 @@ Currently, the WhisperX parameters are abstracted from the client and the servic
 - `/getServerStatus`
 - `/getLogs`
 
-## Notes
-There are 3 modules used by the main script server.py:
-- configuration: contains the configuration enums and the logic to validate the configutration file;
-- api_models: contains all the models used to generate the API documentation with Flask-RestX
-- transcription: contains the logic used to trascribe the files asynchronously
+## Project Structure
+The `server.py` script uses three key modules:
 
-The transcription mode parameters parameters were choosed to maximize the resource usage using an NVIDIA RTX 4070 Ti with 12 GB of VRAM. If you wish to change the behaviour you can check the transcribe function in ``transcriber.py`
+- **configuration**: contains configuration enums and logic for validating the config file;
+- **api_models**: defines models used to generate API documentation via Flask-RestX;
+- **transcription**: implements the logic to transcribe files asynchronously;
+
